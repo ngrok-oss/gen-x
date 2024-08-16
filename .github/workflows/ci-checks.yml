@@ -1,0 +1,38 @@
+name: CI Checks
+
+on: push
+
+jobs:
+  ci-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Setup pnpm 📦
+        uses: pnpm/action-setup@v4
+
+      - name: Install Dependencies 📥
+        run: | # Install node packages
+          pnpm install
+
+      - name: Fmt and Type Check 🧹
+        run: | # Run the lint and type check
+          pnpm run typecheck
+          pnpm run fmt:check
+
+      - name: Test 🧪
+        run: | # Run the tests
+          pnpm run test
+
+      - name: Ensure Package is Publishable 🧐
+        run: | # Run the prepublish hook to ensure the package is publishable, and that the package.json is up to date
+          pnpm run prepublishOnly
+          git diff --exit-code
