@@ -9,7 +9,7 @@ const template = `
 export const packageName = "${name}";
 
 export const packageVersion = "${version}";
-`.trimEnd();
+`.trimStart();
 
 async function main() {
 	await fs.writeFile("src/meta.ts", template, "utf8");
