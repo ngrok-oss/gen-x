@@ -2,4 +2,4 @@
 
 export const packageName = "@ngrok/gen-x";
 
-export const packageVersion = "0.0.2";
+export const packageVersion = "0.0.3";
