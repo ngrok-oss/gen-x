@@ -2,8 +2,11 @@ import { Command, Option } from "@commander-js/extra-typings";
 import { generateExports } from "./index.js";
 import { packageName, packageVersion } from "./meta.js";
 import { parseGlobOption } from "./parse-glob-option.js";
+import { parseReplaceOption, type ReplaceTuples } from "./replace.js";
 import { transformMode, transformModes } from "./transforms/mode.js";
 import { updatePackageJson } from "./update-package-json.js";
+
+const defaultReplaceValue: ReplaceTuples = [];
 
 const program = new Command()
 	.name(packageName)
@@ -18,7 +21,13 @@ const program = new Command()
 			.default(transformMode("passthrough")),
 	)
 	.option("-o, --output <output>", "The output directory for the package export files", "dist")
-	.option("-p, --package <package>", "The path to the package.json file to read from and write to.", "package.json");
+	.option("-p, --package <package>", "The path to the package.json file to read from and write to.", "package.json")
+	.option(
+		"-r, --replace <<pattern=replacement>...>",
+		"Replace export keys, a way to rename exports. Like String.prototype.replace, the pattern is a string or regex, and the replacement is a string. If you want to use a regex pattern, you must use the format /pattern/.",
+		parseReplaceOption,
+		defaultReplaceValue,
+	);
 
 async function cli() {
 	const command = program.parse(process.argv);
@@ -31,6 +40,7 @@ async function cli() {
 	const mode = options.mode ?? "passthrough";
 	const output = options.output.trim() || `${process.cwd()}/dist`;
 	const packageJsonPath = options.package.trim() || `${process.cwd()}/package.json`;
+	const replace = options.replace || [];
 
 	const exports = await generateExports({
 		exclude,
@@ -38,6 +48,7 @@ async function cli() {
 		input,
 		mode,
 		output,
+		replace,
 	});
 
 	await updatePackageJson({
