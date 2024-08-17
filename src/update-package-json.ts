@@ -27,14 +27,14 @@ async function updatePackageJson({ dryRun = false, exports, packageJsonPath }: A
 	const packageJsonFile = await fs.readFile(packageJsonPath, "utf8");
 
 	// convert the package.json file to a JSON object
-	const packageJson = JSON.parse(packageJsonFile) as Record<string, unknown>;
+	const currentPackageJson = JSON.parse(packageJsonFile) as Record<string, unknown>;
 
 	// delete the exports field from the package.json object so it is always at the end
-	delete packageJson.exports;
+	delete currentPackageJson.exports;
 
 	// set the exports field to the new exports object
 	const updatedPackageJson = {
-		...packageJson,
+		...currentPackageJson,
 		exports,
 	};
 
@@ -44,8 +44,10 @@ async function updatePackageJson({ dryRun = false, exports, packageJsonPath }: A
 		return;
 	}
 
+	console.log(`Writing exports to ${packageJsonPath}`);
+
 	// stringify the updated package.json object
-	const data = JSON.stringify(packageJson, null, 2);
+	const data = JSON.stringify(updatedPackageJson, null, 2);
 
 	// write the updated package.json file
 	await fs.writeFile(packageJsonPath, data, "utf8");
