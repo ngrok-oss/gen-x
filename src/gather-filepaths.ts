@@ -17,16 +17,12 @@ type GatherFilepathsOptions = {
 	 * The filepath globs to exclude from the search
 	 */
 	exclude: Array<string>;
-	/**
-	 * The transform mode to apply to the filepaths
-	 */
-	mode: TransformMode;
 };
 
 /**
+ * Return a list of file paths based on the include and exclude globs and the given input directory.
  *
- * @param options
- * @returns
+ * The file paths are relative to the input directory.
  */
 async function gatherFilepaths(options: GatherFilepathsOptions): Promise<Array<string>> {
 	// gather the file paths based on the include and exclude globs and the given input directory
@@ -45,10 +41,7 @@ async function gatherFilepaths(options: GatherFilepathsOptions): Promise<Array<s
 	filepaths.sort((a, b) => a.localeCompare(b));
 
 	// transform the file paths based on the mode
-	return filepaths.map((filepath) => {
-		const relativePath = path.relative(options.input, filepath);
-		return transformFilepathByMode(relativePath, options.mode);
-	});
+	return filepaths.map((filepath) => path.relative(options.input, filepath));
 }
 
 export {

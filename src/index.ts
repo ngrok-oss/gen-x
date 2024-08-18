@@ -1,6 +1,7 @@
 import path from "node:path";
 import { buildPackageJsonExports, ExportsField } from "./build-package-json-exports.js";
 import { gatherFilepaths } from "./gather-filepaths.js";
+import { makeExportItems } from "./make-export-items.js";
 import { ReplaceTuples } from "./replace.js";
 import { TransformMode } from "./transforms/mode.js";
 
@@ -41,11 +42,13 @@ type Args = {
  * Generate the exports object for the package given the arguments.
  */
 async function generateExports(args: Args): Promise<ExportsField> {
-	const { exclude, include, input, output, mode } = parseArguments(args);
+	const { exclude, include, input, output, mode, replace } = parseArguments(args);
 
-	const filepaths = await gatherFilepaths({ input, include, exclude, mode });
+	const filepaths = await gatherFilepaths({ input, include, exclude });
 
-	const exports = buildPackageJsonExports(filepaths, output);
+	const exportItems = makeExportItems(filepaths, { mode, replace });
+
+	const exports = buildPackageJsonExports(exportItems, output);
 
 	return exports;
 }

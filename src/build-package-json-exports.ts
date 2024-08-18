@@ -1,7 +1,8 @@
 import path from "path";
+import { ExportItem } from "./make-export-items.js";
 
-export type ExportItem = string | { import: string; types: string };
-export type ExportsField = Record<string, ExportItem>;
+export type ExportEntry = string | { import: string; types: string };
+export type ExportsField = Record<string, ExportEntry>;
 
 // base exports for the package.json
 const baseExports = {
@@ -13,10 +14,10 @@ const baseExports = {
  *
  * @default outputDir `dist`
  */
-function buildPackageJsonExports(filepaths: Array<string>, outputDir: string = "dist"): ExportsField {
-	return filepaths.reduce<ExportsField>((acc, filepath) => {
-		const parsed = path.parse(filepath);
-		const name = [".", parsed.dir, parsed.name].filter(Boolean).join(path.sep);
+function buildPackageJsonExports(exportItems: Array<ExportItem>, outputDir: string = "dist"): ExportsField {
+	return exportItems.reduce<ExportsField>((acc, item) => {
+		const parsed = path.parse(item.path);
+		const name = [".", item.name].filter(Boolean).join(path.sep);
 		const exportPath = [".", outputDir, parsed.dir, parsed.name].filter(Boolean).join(path.sep);
 
 		acc[name] = {
