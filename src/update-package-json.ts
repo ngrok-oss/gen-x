@@ -24,22 +24,23 @@ type Args = {
  */
 async function updatePackageJson({ dryRun = false, exports, packageJsonPath }: Args) {
 	// read the package.json file
-	const packageJsonFile = await fs.readFile(packageJsonPath, "utf8");
+	const originalPackageJsonFile = await fs.readFile(packageJsonPath, "utf8");
 
 	// convert the package.json file to a JSON object
-	const currentPackageJson = JSON.parse(packageJsonFile) as Record<string, unknown>;
+	const originalPackageJson = JSON.parse(originalPackageJsonFile) as Record<string, unknown>;
 
 	// delete the exports field from the package.json object so it is always at the end
-	delete currentPackageJson.exports;
+	delete originalPackageJson.exports;
 
 	// set the exports field to the new exports object
 	const updatedPackageJson = {
-		...currentPackageJson,
+		...originalPackageJson,
 		exports,
 	};
 
 	// don't write to disk if dry run is set, just preview the changes in stdout
 	if (dryRun) {
+		console.log("Dry run:");
 		console.log(updatedPackageJson);
 		return;
 	}
@@ -47,7 +48,16 @@ async function updatePackageJson({ dryRun = false, exports, packageJsonPath }: A
 	console.log(`Writing exports to ${packageJsonPath}`);
 
 	// stringify the updated package.json object
-	const data = JSON.stringify(updatedPackageJson, null, 2);
+	let data = JSON.stringify(updatedPackageJson, null, 2);
+
+	// preserve cross-platform EOF newline if original package.json file has one
+	let eofNewline = "";
+	if (originalPackageJsonFile.endsWith("\r\n")) {
+		eofNewline = "\r\n"; // Windows-style newline
+	} else if (originalPackageJsonFile.endsWith("\n")) {
+		eofNewline = "\n"; // Unix-style newline
+	}
+	data += eofNewline;
 
 	// write the updated package.json file
 	await fs.writeFile(packageJsonPath, data, "utf8");
