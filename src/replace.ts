@@ -1,3 +1,5 @@
+import { isRegexString, parseRegexString } from "./regex.js";
+
 /**
  * A tuple representing a pattern and replacement string, where the pattern is a string or regex.
  */
@@ -30,17 +32,17 @@ function parseReplaceOption(value: string, acc: ReplaceTuples): ReplaceTuples {
 		return acc;
 	}
 
-	const pattern = parts.at(0)?.trim();
-	const replacement = parts.at(1)?.trim();
+	const pattern = decodeURIComponent(parts.at(0)?.trim() ?? "");
+	const replacement = parts.at(1)?.trim() ?? "";
 
-	if (!pattern || !replacement) {
+	if (!pattern) {
 		return acc;
 	}
 
 	// check for regex pattern
-	if (pattern.startsWith("/")) {
+	if (isRegexString(pattern)) {
 		try {
-			const regex = new RegExp(pattern);
+			const regex = parseRegexString(pattern);
 			acc.push([regex, replacement]);
 		} catch {
 			acc.push([pattern, replacement]);

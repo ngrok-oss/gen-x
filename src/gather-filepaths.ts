@@ -1,5 +1,6 @@
 import path from "node:path";
 import { glob } from "tinyglobby";
+import { setDifference } from "./set.js";
 import { TransformMode } from "./transforms/mode.js";
 import { transformFilepathByMode } from "./transforms/transform-filepath-by-mode.js";
 
@@ -37,7 +38,7 @@ async function gatherFilepaths(options: GatherFilepathsOptions): Promise<Array<s
 	// filter out any excluded file paths
 	const includeSet = new Set(includeFilepaths);
 	const excludeSet = new Set(excludeFilepaths);
-	const uniqueFilepaths = difference(includeSet, excludeSet);
+	const uniqueFilepaths = setDifference(includeSet, excludeSet);
 	const filepaths = Array.from(uniqueFilepaths);
 
 	// alphasort the file paths
@@ -54,17 +55,3 @@ export {
 	//,
 	gatherFilepaths,
 };
-
-/**
- * Ponyfill for `Set.prototype.difference`
- * Takes two sets A and B; and returns a new set containing elements in the A set but not in the B set
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set/difference
- */
-function difference(a: Set<string>, b: Set<string>): Set<string> {
-	const result = new Set(a);
-	for (const item of b) {
-		result.delete(item);
-	}
-	return result;
-}
