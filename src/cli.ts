@@ -2,7 +2,7 @@ import { Command, Option } from "@commander-js/extra-typings";
 import { generateExports } from "./index.js";
 import { packageName, packageVersion } from "./meta.js";
 import { parseGlobOption } from "./parse-glob-option.js";
-import { parseReplaceOption, type ReplaceTuples } from "./replace.js";
+import { parseReplaceOption, replaceSentinel, type ReplaceTuples } from "./replace.js";
 import { transformMode, transformModes } from "./transforms/mode.js";
 import { updatePackageJson } from "./update-package-json.js";
 
@@ -23,7 +23,7 @@ const program = new Command()
 	.option("-o, --output <output>", "The output directory for the package export files", "dist")
 	.option("-p, --package <package>", "The path to the package.json file to read from and write to.", "package.json")
 	.option(
-		"-r, --replace <<pattern=replacement>...>",
+		`-r, --replace <<pattern${replaceSentinel}replacement>...>`,
 		"Replace export keys, a way to rename exports. Like String.prototype.replace, the pattern is a string or regex, and the replacement is a string. If you want to use a regex pattern, you must use the format /pattern/.",
 		parseReplaceOption,
 		defaultReplaceValue,
