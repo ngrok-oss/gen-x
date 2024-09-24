@@ -20,6 +20,10 @@ const program = new Command()
 			.choices(transformModes)
 			.default(transformMode("passthrough")),
 	)
+	.option(
+		"--customCondition <customCondition>",
+		'Add a unique custom condition to the package.json exports for supporting live types in a monorepo, e.g. "@my-package/source". Will map the custom condition to the source TypeScript file path.',
+	)
 	.option("-o, --output <output>", "The output directory for the package export files", "dist")
 	.option("-p, --package <package>", "The path to the package.json file to read from and write to.", "package.json")
 	.option(
@@ -41,8 +45,10 @@ async function cli() {
 	const output = options.output.trim() || `${process.cwd()}/dist`;
 	const packageJsonPath = options.package.trim() || `${process.cwd()}/package.json`;
 	const replace = options.replace || [];
+	const customCondition = options.customCondition?.trim() || null;
 
 	const exports = await generateExports({
+		customCondition,
 		exclude,
 		include,
 		input,

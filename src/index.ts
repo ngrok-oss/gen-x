@@ -7,6 +7,12 @@ import { TransformMode } from "./transforms/mode.js";
 
 type Args = {
 	/**
+	 * A unique custom condition to add to the package.json exports, e.g. `@my-package/source`.
+	 * Useful for supporting live types in a monorepo. Will map the custom condition to the source TypeScript file path.
+	 * @see https://colinhacks.com/essays/live-types-typescript-monorepo#:~:text=5.%20Custom%20conditions%20in%20%22exports%22
+	 */
+	customCondition?: string | undefined | null;
+	/**
 	 * A list of globs to exclude file paths from.
 	 * @default `["**\/*.test.*"]`
 	 */
@@ -42,13 +48,13 @@ type Args = {
  * Generate the exports object for the package given the arguments.
  */
 async function generateExports(args: Args): Promise<ExportsField> {
-	const { exclude, include, input, output, mode, replace } = parseArguments(args);
+	const { customCondition, exclude, include, input, output, mode, replace } = parseArguments(args);
 
 	const filepaths = await gatherFilepaths({ input, include, exclude });
 
 	const exportItems = makeExportItems(filepaths, { mode, replace });
 
-	const exports = buildPackageJsonExports(exportItems, output);
+	const exports = buildPackageJsonExports(exportItems, { outputDir: output, customCondition });
 
 	return exports;
 }
@@ -62,6 +68,7 @@ export {
  * Parse the arguments object and return a new object with all properties as required.
  */
 function parseArguments(args: Args): Required<Args> {
+	const customCondition = args.customCondition ?? null;
 	const exclude = args.exclude ?? ["**/*.test.*"];
 	const include = args.include ?? ["**/*"];
 	const input = args.input?.trim() || [process.cwd(), "src"].join(path.sep);
@@ -70,6 +77,7 @@ function parseArguments(args: Args): Required<Args> {
 	const replace = args.replace ?? [];
 
 	return {
+		customCondition,
 		exclude,
 		include,
 		input,
