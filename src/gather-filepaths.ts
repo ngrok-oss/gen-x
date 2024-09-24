@@ -40,8 +40,7 @@ async function gatherFilepaths(options: GatherFilepathsOptions): Promise<Array<s
 	// alphasort the file paths
 	filepaths.sort((a, b) => a.localeCompare(b));
 
-	// transform the file paths based on the mode
-	return filepaths.map((filepath) => path.relative(options.input, filepath));
+	return filepaths.map((filepath) => path.relative(`${options.input}/..`, filepath));
 }
 
 export {

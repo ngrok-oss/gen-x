@@ -5,13 +5,17 @@ import { transformFilepathByMode } from "./transforms/transform-filepath-by-mode
 
 export type ExportItem = {
 	/**
-	 * The name of the export, lower-kebab-case
+	 * The name of the export, may be transformed by the mode and replaced by the replace tuples
 	 */
 	name: string;
 	/**
 	 * The export's path, relative to the containing directory, sans the file extension
 	 */
 	path: string;
+	/**
+	 * The export's source directory
+	 */
+	srcDir: string;
 };
 
 type Options = {
@@ -35,11 +39,14 @@ type Options = {
  */
 function makeExportItems(filepaths: Array<string>, options: Options): Array<ExportItem> {
 	return filepaths.map((filepath) => {
-		const name = makeNameFromFilepath(filepath, options);
+		const srcDir = path.dirname(filepath);
+		const exportPath = path.relative(srcDir, filepath);
+		const name = makeNameFromFilepath(exportPath, options);
 
 		return {
 			name,
-			path: filepath,
+			path: exportPath,
+			srcDir,
 		};
 	});
 }
