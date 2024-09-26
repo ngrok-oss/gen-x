@@ -28,8 +28,6 @@ function buildPackageJsonExports(exportItems: Array<ExportItem>, options?: Optio
 	const outputDir = options?.outputDir?.trim() || "dist";
 	const customCondition = options?.customCondition?.trim();
 
-	console.log("buildPackageJsonExports", { outputDir, customCondition });
-
 	return exportItems.reduce<ExportsField>((acc, item) => {
 		const parsed = path.parse(item.path);
 		const name = [".", item.name].filter(Boolean).join(path.sep);

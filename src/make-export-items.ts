@@ -20,6 +20,10 @@ export type ExportItem = {
 
 type Options = {
 	/**
+	 * The input directory to gather file paths from.
+	 */
+	input: string;
+	/**
 	 * The mode to transform filepath segments.
 	 */
 	mode: TransformMode;
@@ -39,7 +43,7 @@ type Options = {
  */
 function makeExportItems(filepaths: Array<string>, options: Options): Array<ExportItem> {
 	return filepaths.map((filepath) => {
-		const srcDir = path.dirname(filepath);
+		const srcDir = options.input;
 		const exportPath = path.relative(srcDir, filepath);
 		const name = makeNameFromFilepath(exportPath, options);
 

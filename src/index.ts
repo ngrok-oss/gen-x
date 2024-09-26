@@ -52,7 +52,7 @@ async function generateExports(args: Args): Promise<ExportsField> {
 
 	const filepaths = await gatherFilepaths({ input, include, exclude });
 
-	const exportItems = makeExportItems(filepaths, { mode, replace });
+	const exportItems = makeExportItems(filepaths, { input, mode, replace });
 
 	const exports = buildPackageJsonExports(exportItems, { outputDir: output, customCondition });
 
